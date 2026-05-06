@@ -2,48 +2,42 @@
 
 namespace Kayue\WordpressBundle\Doctrine;
 
-use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\Decorator\EntityManagerDecorator;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
-class WordpressEntityManager extends EntityManager
+class WordpressEntityManager extends EntityManagerDecorator
 {
-    protected $blogId = 1;
+    protected int $blogId = 1;
 
-    /**
-     * @param int $blogId
-     */
-    public function setBlogId($blogId)
+    public function __construct(EntityManagerInterface $wrapped)
+    {
+        parent::__construct($wrapped);
+    }
+
+    public function setBlogId(int $blogId): void
     {
         $this->blogId = $blogId;
     }
 
-    /**
-     * @return int
-     */
-    public function getBlogId()
+    public function getBlogId(): int
     {
         return $this->blogId;
     }
 
-    /**
-     * Factory method to create EntityManager instances.
-     *
-     * @param  mixed                  $conn         An array with the connection parameters or an existing
-     *                                              Connection instance.
-     * @param  Configuration          $config       The Configuration instance to use.
-     * @param  EventManager           $eventManager The EventManager instance to use.
-     * @return WordpressEntityManager The created EntityManager.
-     */
-    public static function create($conn, Configuration $config, EventManager $eventManager = null)
+    public static function create(Connection $conn, Configuration $config): self
     {
-        return new static($conn, $config, $conn->getEventManager());
+        $em = EntityManager::create($conn, $config, $conn->getEventManager());
+        return new self($em);
     }
 
-    public function getRepository($entityName)
+    public function getRepository($entityName): EntityRepository
     {
         if (strpos($entityName, 'KayueWordpressBundle:') !== 0) {
-            $entityName = 'KayueWordpressBundle:'.$entityName;
+            $entityName = 'KayueWordpressBundle:' . $entityName;
         }
 
         return parent::getRepository($entityName);

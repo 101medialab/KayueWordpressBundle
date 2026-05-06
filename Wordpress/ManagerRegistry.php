@@ -3,19 +3,14 @@
 namespace Kayue\WordpressBundle\Wordpress;
 
 use BadMethodCallException;
-use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
-use Psr\Cache\CacheItemPoolInterface;
-use Redis;
-use Memcache;
-use Memcached;
 use Doctrine\DBAL\Driver\Connection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\Persistence\ManagerRegistry as ManagerRegistryInterface;
 use Kayue\WordpressBundle\Doctrine\WordpressEntityManager;
 use Kayue\WordpressBundle\WordpressEvents;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
@@ -27,7 +22,7 @@ class ManagerRegistry implements ManagerRegistryInterface
     protected $connection;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     protected $defaultEntityManager;
 
@@ -42,19 +37,19 @@ class ManagerRegistry implements ManagerRegistryInterface
     protected $previousBlogId = 1;
     protected $managers = [];
 
-    private $metaCache;
+    private $metadataCache;
     private $queryCache;
     private $resultCache;
 
     public function __construct(
         Connection $connection,
-        EntityManager $defaultEntityManager,
+        EntityManagerInterface $defaultEntityManager,
         EventDispatcherInterface $eventDispatcher,
         $rootDir,
         $environment,
-        AdapterInterface $metadataCache,
-        AdapterInterface $queryCache,
-        AdapterInterface $resultCache
+        CacheItemPoolInterface $metadataCache,
+        CacheItemPoolInterface $queryCache,
+        CacheItemPoolInterface $resultCache
     )
     {
         $this->connection = $connection;
@@ -79,20 +74,20 @@ class ManagerRegistry implements ManagerRegistryInterface
         }
 
         if (!isset($this->managers[$this->currentBlogId])) {
-            $config = Setup::createAnnotationMetadataConfiguration([], 'prod' !== $this->environment, null, null, false);
+            $config = ORMSetup::createAttributeMetadataConfiguration([], 'prod' !== $this->environment);
             $config->addEntityNamespace('KayueWordpressBundle', 'Kayue\WordpressBundle\Entity');
             $config->setAutoGenerateProxyClasses(true);
             $config->setProxyDir($this->defaultEntityManager->getConfiguration()->getProxyDir());
 
+            $config->setMetadataCache($this->getCachePool($this->metadataCache, $this->currentBlogId));
+            $config->setQueryCache($this->getCachePool($this->queryCache, $this->currentBlogId));
+            $config->setResultCache($this->getCachePool($this->resultCache, $this->currentBlogId));
+
             $em = WordpressEntityManager::create($this->connection, $config);
 
-            $this->eventDispatcher->dispatch(WordpressEvents::CREATE_ENTITY_MANAGER, new GenericEvent($em));
+            $this->eventDispatcher->dispatch(new GenericEvent($em), WordpressEvents::CREATE_ENTITY_MANAGER);
 
             $em->setBlogId($this->currentBlogId);
-
-            $em->getMetadataFactory()->setCacheDriver($this->getCacheProvider($this->metadataCache, $this->currentBlogId));
-            $em->getConfiguration()->setQueryCacheImpl($this->getCacheProvider($this->queryCache, $this->currentBlogId));
-            $em->getConfiguration()->setResultCacheImpl($this->getCacheProvider($this->resultCache, $this->currentBlogId));
 
             $this->managers[$this->currentBlogId] = $em;
         }
@@ -123,13 +118,10 @@ class ManagerRegistry implements ManagerRegistryInterface
         $this->setCurrentBlogId($this->previousBlogId);
     }
 
-    protected function getCacheProvider(CacheItemPoolInterface $pool, $blogId)
+    protected function getCachePool(CacheItemPoolInterface $pool, int $blogId): CacheItemPoolInterface
     {
         $namespace = sprintf('wordpress_blog_%s_', $blogId);
-        $proxyAdapter = new ProxyAdapter($pool, $namespace);
-        $doctrineCache = new DoctrineProvider($proxyAdapter);
-
-        return $doctrineCache;
+        return new ProxyAdapter($pool, $namespace);
     }
 
     public function getDefaultConnectionName()
