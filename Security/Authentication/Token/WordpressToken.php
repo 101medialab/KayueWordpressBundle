@@ -16,8 +16,4 @@ class WordpressToken extends AbstractToken
         $this->setUser($user);
     }
 
-    public function getCredentials()
-    {
-        return '';
-    }
 }

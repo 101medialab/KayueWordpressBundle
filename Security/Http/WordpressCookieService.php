@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -98,7 +98,7 @@ class WordpressCookieService
             }
 
             return new WordpressToken($user);
-        } catch (UsernameNotFoundException $notFound) {
+        } catch (UserNotFoundException $notFound) {
             if (null !== $this->logger) {
                 $this->logger->info('User for WordPress cookie not found.');
             }

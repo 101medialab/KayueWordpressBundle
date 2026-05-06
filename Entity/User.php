@@ -361,7 +361,7 @@ class User implements UserInterface
      *
      * @return \Symfony\Component\Security\Core\Role\Role[] The user roles
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         $roles = array();
         $metas = $this->getMetas()->filter(function (UserMeta $meta) {
@@ -386,18 +386,6 @@ class User implements UserInterface
     }
 
     /**
-     * Returns the salt that was originally used to encode the password.
-     *
-     * This can return null if the password was not encoded using a salt.
-     *
-     * @return string The salt
-     */
-    public function getSalt()
-    {
-
-    }
-
-    /**
      * Removes sensitive data from the user.
      *
      * This is important if, at any given point, sensitive information like
@@ -405,7 +393,7 @@ class User implements UserInterface
      *
      * @return void
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
 
     }

@@ -30,11 +30,6 @@ class WordpressUserProvider implements UserProviderInterface
         return $user;
     }
 
-    public function loadUserByUsername($username): UserInterface
-    {
-        return $this->loadUserByIdentifier($username);
-    }
-
     public function refreshUser(UserInterface $user): UserInterface
     {
         return $this->managerRegistry
