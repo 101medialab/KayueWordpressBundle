@@ -2,7 +2,7 @@
 
 namespace Kayue\WordpressBundle\Security\Encoder;
 
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
  * requirements (there can be none), but merely suggestions.
  */
 
-class PhpassPasswordEncoder implements PasswordEncoderInterface
+class PhpassPasswordEncoder implements PasswordHasherInterface
 {
     public $itoa64;
     public $iteration_count_log2;
@@ -42,20 +42,19 @@ class PhpassPasswordEncoder implements PasswordEncoderInterface
         $this->random_state = microtime() . uniqid(rand(), TRUE); // removed getmypid() for compatibility reasons
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function encodePassword($raw, $salt = null)
+    public function hash(string $plainPassword): string
     {
-        return $this->hashPassword($raw);
+        return $this->hashPassword($plainPassword);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isPasswordValid($encoded, $raw, $salt = null)
+    public function verify(string $hashedPassword, string $plainPassword): bool
     {
-        return $this->checkPassword($raw, $encoded);
+        return $this->checkPassword($plainPassword, $hashedPassword);
+    }
+
+    public function needsRehash(string $hashedPassword): bool
+    {
+        return false;
     }
 
     private function getRandomBytes($count)
