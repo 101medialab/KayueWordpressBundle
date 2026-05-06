@@ -5,123 +5,105 @@ namespace Kayue\WordpressBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Kayue\WordpressBundle\Annotation as Wordpress;
-use Serializable;
 use Symfony\Component\Validator\Constraints as Constraints;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * Kayue\WordpressBundle\Entity\User
- *
- * @ORM\Table(name="users")
- * @ORM\Entity
- * @UniqueEntity({"fields": "email", "message": "Sorry, that email address is already used."})
- * @UniqueEntity({"fields": "username", "message": "Sorry, that username is already used."})
- * @UniqueEntity({"fields": "nicename", "message": "Sorry, that nicename is already used."})
- * @UniqueEntity({"fields": "displayName", "message": "Sorry, that display name has already been taken."})
- * @ORM\HasLifecycleCallbacks
- * @Wordpress\WordpressTable
- */
-class User implements UserInterface, Serializable
+#[ORM\Table(name: "users")]
+#[ORM\Entity]
+#[UniqueEntity(fields: ["email"], message: "Sorry, that email address is already used.")]
+#[UniqueEntity(fields: ["username"], message: "Sorry, that username is already used.")]
+#[UniqueEntity(fields: ["nicename"], message: "Sorry, that nicename is already used.")]
+#[UniqueEntity(fields: ["displayName"], message: "Sorry, that display name has already been taken.")]
+#[ORM\HasLifecycleCallbacks]
+#[Wordpress\WordpressTable]
+class User implements UserInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="ID", type="wordpressid", length=20)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Column(name: "ID", type: "wordpressid", length: 20)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     protected $id;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_login", type="string", length=60, unique=true)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "user_login", type: "string", length: 60, unique: true)]
+    #[Constraints\NotBlank]
     protected $username;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_pass", type="string", length=64)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "user_pass", type: "string", length: 64)]
+    #[Constraints\NotBlank]
     protected $password;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_nicename", type="string", length=64)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "user_nicename", type: "string", length: 64)]
+    #[Constraints\NotBlank]
     protected $nicename;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_email", type="string", length=100)
-     * @Constraints\NotBlank()
-     * @Constraints\Email()
      */
+    #[ORM\Column(name: "user_email", type: "string", length: 100)]
+    #[Constraints\NotBlank]
+    #[Constraints\Email]
     protected $email;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_url", type="string", length=100)
-     * @Constraints\Url()
      */
+    #[ORM\Column(name: "user_url", type: "string", length: 100)]
+    #[Constraints\Url]
     protected $url = '';
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_registered", type="datetime")
      */
+    #[ORM\Column(name: "user_registered", type: "datetime")]
     protected $registeredDate;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_activation_key", type="string", length=60)
      */
+    #[ORM\Column(name: "user_activation_key", type: "string", length: 60)]
     protected $activationKey = '';
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="user_status", type="integer", length=11)
      */
+    #[ORM\Column(name: "user_status", type: "integer", length: 11)]
     protected $status = 0;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="display_name", type="string", length=250)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "display_name", type: "string", length: 250)]
+    #[Constraints\NotBlank]
     protected $displayName;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\UserMeta", mappedBy="user", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: UserMeta::class, mappedBy: "user", cascade: ["persist"])]
     protected $metas;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\Post", mappedBy="user")
      */
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: "user")]
     protected $posts;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\Comment", mappedBy="user")
      */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: "user")]
     protected $comments;
 
     public function __construct()
@@ -428,60 +410,28 @@ class User implements UserInterface, Serializable
 
     }
 
-    /**
-     * Returns whether or not the given user is equivalent to *this* user.
-     *
-     * The equality comparison should neither be done by referential equality
-     * nor by comparing identities (i.e. getId() === getId()).
-     *
-     * However, you do not need to compare every attribute, but only those that
-     * are relevant for assessing whether re-authentication is required.
-     *
-     * @param UserInterface $user
-     *
-     * @return Boolean
-     */
-    public function equals(UserInterface $user)
+    public function getUserIdentifier(): string
     {
-        return $this->getUsername() === $user->getUsername();
+        return $this->username;
     }
 
-    /**
-     * Serializes the user.
-     *
-     * The serialized data have to contain the fields used by the equals method and the username.
-     *
-     * @return string
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(array(
+        return [
             $this->id,
             $this->username,
-        ));
+        ];
     }
 
-    /**
-     * Unserializes the user.
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        $data = unserialize($serialized);
-        // add a few extra elements in the array to ensure that we have enough keys when unserializing
-        // older data which does not include all properties.
-        $data = array_merge($data, array_fill(0, 2, null));
-
-        list(
+        [
             $this->id,
             $this->username,
-            ) = $data;
+        ] = $data;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->registeredDate = new \DateTime('now');

@@ -7,57 +7,48 @@ use Doctrine\ORM\Mapping as ORM;
 use Kayue\WordpressBundle\Annotation as Wordpress;
 use Symfony\Component\Validator\Constraints as Constraints;
 
-/**
- * @ORM\Table(name="terms")
- * @ORM\Entity
- * @ORM\Entity(repositoryClass="Kayue\WordpressBundle\Repository\TermRepository")
- * @Wordpress\WordpressTable
- */
+#[ORM\Table(name: "terms")]
+#[ORM\Entity(repositoryClass: \Kayue\WordpressBundle\Repository\TermRepository::class)]
+#[Wordpress\WordpressTable]
 class Term
 {
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="term_id", type="wordpressid", length=20)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Column(name: "term_id", type: "wordpressid", length: 20)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     protected $id;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="name", type="string", length=200)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "name", type: "string", length: 200)]
+    #[Constraints\NotBlank]
     protected $name;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="slug", type="string", length=200)
      */
+    #[ORM\Column(name: "slug", type: "string", length: 200)]
     protected $slug;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="term_group", type="bigint", length=10)
      */
+    #[ORM\Column(name: "term_group", type: "bigint", length: 10)]
     protected $group = 0;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToOne(targetEntity="Taxonomy", mappedBy="term")
      */
+    #[ORM\OneToOne(targetEntity: Taxonomy::class, mappedBy: "term")]
     protected $taxonomy;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\TermMeta", mappedBy="term", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: TermMeta::class, mappedBy: "term", cascade: ["persist"])]
     protected $metas;
 
     public function __construct()

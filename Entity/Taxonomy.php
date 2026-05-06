@@ -7,66 +7,55 @@ use Doctrine\ORM\Mapping as ORM;
 use Kayue\WordpressBundle\Annotation as Wordpress;
 use Symfony\Component\Validator\Constraints as Constraints;
 
-/**
- * @ORM\Table(name="term_taxonomy")
- * @ORM\Entity
- * @Wordpress\WordpressTable
- */
+#[ORM\Table(name: "term_taxonomy")]
+#[ORM\Entity]
+#[Wordpress\WordpressTable]
 class Taxonomy
 {
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="term_taxonomy_id", type="wordpressid", length=20)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Column(name: "term_taxonomy_id", type: "wordpressid", length: 20)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     protected $id;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="taxonomy", type="string", length=32)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "taxonomy", type: "string", length: 32)]
+    #[Constraints\NotBlank]
     protected $name;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="description", type="text")
      */
+    #[ORM\Column(name: "description", type: "text")]
     protected $description = '';
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="parent", type="bigint", length=20)
      */
+    #[ORM\Column(name: "parent", type: "bigint", length: 20)]
     protected $parent;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="count", type="bigint", length=20)
      */
+    #[ORM\Column(name: "count", type: "bigint", length: 20)]
     protected $count = 0;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToOne(targetEntity="Kayue\WordpressBundle\Entity\Term", inversedBy="taxonomy")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="term_id", referencedColumnName="term_id", unique=true)
-     * })
      */
+    #[ORM\OneToOne(targetEntity: Term::class, inversedBy: "taxonomy")]
+    #[ORM\JoinColumn(name: "term_id", referencedColumnName: "term_id", unique: true)]
     protected $term;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\ManyToMany(targetEntity="Post", mappedBy="taxonomies")
      */
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: "taxonomies")]
     protected $posts;
 
     public function __construct()

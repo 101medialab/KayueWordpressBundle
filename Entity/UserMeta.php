@@ -4,51 +4,41 @@ namespace Kayue\WordpressBundle\Entity;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\Persistence\Proxy;
 use Kayue\WordpressBundle\Annotation as Wordpress;
 use Symfony\Component\Validator\Constraints as Constraints;
 
-/**
- * Kayue\WordpressBundle\Entity\UserMeta
- *
- * @ORM\Table(name="usermeta")
- * @ORM\Entity
- * @Wordpress\WordpressTable
- */
+#[ORM\Table(name: "usermeta")]
+#[ORM\Entity]
+#[Wordpress\WordpressTable]
 class UserMeta
 {
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="umeta_id", type="bigint", length=20)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Column(name: "umeta_id", type: "bigint", length: 20)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     protected $id;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="meta_key", type="string", length=255, nullable=true)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "meta_key", type: "string", length: 255, nullable: true)]
+    #[Constraints\NotBlank]
     protected $key;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="meta_value", type="wordpressmeta", nullable=true)
      */
+    #[ORM\Column(name: "meta_value", type: "wordpressmeta", nullable: true)]
     protected $value;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\ManyToOne(targetEntity="Kayue\WordpressBundle\Entity\User", inversedBy="metas")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="ID")
-     * })
      */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "metas")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "ID")]
     protected $user;
 
     /**
