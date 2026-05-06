@@ -2,9 +2,9 @@
 
 namespace Kayue\WordpressBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ShortcodeController extends Controller
+class ShortcodeController extends AbstractController
 {
     /**
      * @param  int                                                           $id
