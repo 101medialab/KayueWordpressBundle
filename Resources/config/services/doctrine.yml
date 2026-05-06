@@ -7,4 +7,4 @@ services:
         arguments:
             - '%kayue_wordpress.table_prefix%'
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
