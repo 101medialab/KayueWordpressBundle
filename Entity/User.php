@@ -398,6 +398,11 @@ class User implements UserInterface
 
     }
 
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
     public function getUserIdentifier(): string
     {
         return $this->username;
