@@ -10,12 +10,12 @@
 
     "require": {
         "php": "^8.2",
-        "symfony/framework-bundle": "^5.4|^6.0|^7.0",
-        "symfony/security-bundle": "^5.4|^6.0|^7.0",
-        "symfony/password-hasher": "^5.4|^6.0|^7.0",
-        "symfony/cache": "^5.4|^6.0|^7.0",
-        "doctrine/orm": "^2.14|^3.0",
-        "doctrine/dbal": "^3.0|^4.0",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/security-bundle": "^5.4",
+        "symfony/password-hasher": "^5.4",
+        "symfony/cache": "^5.4",
+        "doctrine/orm": "^2.14",
+        "doctrine/dbal": "^3.0",
         "twig/twig": "^3.0"
     },
     "require-dev": {
