@@ -4,15 +4,16 @@ namespace Kayue\WordpressBundle\Tests\Wordpress\Shortcode;
 
 use Kayue\WordpressBundle\Wordpress\Shortcode\CaptionShortcode;
 use Kayue\WordpressBundle\Wordpress\Shortcode\ShortcodeChain;
+use PHPUnit\Framework\TestCase;
 
-class CaptionShortcodeTest extends \PHPUnit_Framework_TestCase
+class CaptionShortcodeTest extends TestCase
 {
     /**
      * @var ShortcodeChain
      */
     public $chain;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chain = new ShortcodeChain();
         $this->chain->addShortcode(new CaptionShortcode());

@@ -3,8 +3,9 @@
 namespace Kayue\WordpressBundle\Tests\Wordpress\Shortcode;
 
 use Kayue\WordpressBundle\Wordpress\Shortcode\GalleryShortcode;
+use PHPUnit\Framework\TestCase;
 
-class GalleryShortcodeTest extends \PHPUnit_Framework_TestCase
+class GalleryShortcodeTest extends TestCase
 {
     public function testProcess()
     {
@@ -21,13 +22,13 @@ class GalleryShortcodeTest extends \PHPUnit_Framework_TestCase
             ->method('findImageWithIds')
             ->will($this->returnValue(array()))
         ;
-        $templatingMock = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $templatingMock = $this->createMock(\Symfony\Component\Templating\EngineInterface::class);
         $templatingMock
             ->expects($this->any())
             ->method('render')
             ->will($this->returnValue('something'))
         ;
-        $container = $this->getMock('Symfony\Component\DependencyInjection\Container');
+        $container = $this->createMock(\Symfony\Component\DependencyInjection\Container::class);
         $container
             ->expects($this->any())
             ->method('get')

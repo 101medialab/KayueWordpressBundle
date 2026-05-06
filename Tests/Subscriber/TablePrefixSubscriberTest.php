@@ -2,17 +2,12 @@
 
 namespace Kayue\WordpressBundle\Tests\Subscriber;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Kayue\WordpressBundle\Subscriber\TablePrefixSubscriber;
+use PHPUnit\Framework\TestCase;
 
-class TablePrefixSubscriberTest extends \PHPUnit_Framework_TestCase
+class TablePrefixSubscriberTest extends TestCase
 {
-    protected function setUp()
-    {
-        AnnotationRegistry::registerFile(__DIR__ . '/../../Annotation/WordpressTable.php');
-    }
-
     public function testLoadClassMetadataWithWordpressBundleEntity()
     {
         $subscriber = new TablePrefixSubscriber('wp_');

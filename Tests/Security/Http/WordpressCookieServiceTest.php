@@ -5,9 +5,10 @@ namespace Kayue\WordpressBundle\Tests\Security\Http;
 use Kayue\WordpressBundle\Security\Authentication\Token\WordpressToken;
 use Kayue\WordpressBundle\Security\Http\WordpressCookieService;
 use Kayue\WordpressBundle\Wordpress\ConfigurationManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class WordpressCookieServiceTest extends \PHPUnit_Framework_TestCase
+class WordpressCookieServiceTest extends TestCase
 {
     public function testAutoLoginCookie()
     {
@@ -68,11 +69,10 @@ class WordpressCookieServiceTest extends \PHPUnit_Framework_TestCase
 
     private function getService()
     {
-        $mock = $this->getMock(
-            'Kayue\WordpressBundle\Security\Http\WordpressCookieService',
-            array('generateHmac'),
-            array($this->getConfigurationManager(), $this->getUserProviderMock())
-        );
+        $mock = $this->getMockBuilder(WordpressCookieService::class)
+            ->setConstructorArgs([$this->getConfigurationManager(), $this->getUserProviderMock()])
+            ->onlyMethods(['generateHmac'])
+            ->getMock();
         $mock->expects($this->any())
             ->method('generateHmac')
             ->withAnyParameters()
@@ -88,7 +88,7 @@ class WordpressCookieServiceTest extends \PHPUnit_Framework_TestCase
 
     private function getUserProviderMock()
     {
-        $userProviderMock = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $userProviderMock = $this->createMock(\Symfony\Component\Security\Core\User\UserProviderInterface::class);
         $userProviderMock->expects($this->any())
             ->method('loadUserByUsername')
             ->with('admin')
@@ -99,9 +99,9 @@ class WordpressCookieServiceTest extends \PHPUnit_Framework_TestCase
 
     private function getUserMock()
     {
-        $userMock = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock = $this->createMock(\Symfony\Component\Security\Core\User\UserInterface::class);
         $userMock->expects($this->any())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->will($this->returnValue('admin'));
         $userMock->expects($this->any())
             ->method('getPassword')
