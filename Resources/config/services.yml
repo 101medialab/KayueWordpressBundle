@@ -61,7 +61,6 @@ services:
 
     kayue_wordpress.security.logout.handler.cookie_clearing:
         class: '%kayue_wordpress.security.logout.handler.cookie_clearing.class%'
-        parent: security.logout.handler.cookie_clearing
         arguments:
             - '@kayue_wordpress.manager.authentication_cookie'
 
