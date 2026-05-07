@@ -56,8 +56,8 @@ class WordpressEntityManager extends EntityManagerDecorator
 
     public function getRepository($entityName): EntityRepository
     {
-        if (strpos($entityName, 'KayueWordpressBundle:') !== 0) {
-            $entityName = 'KayueWordpressBundle:' . $entityName;
+        if (str_starts_with($entityName, 'KayueWordpressBundle:')) {
+            $entityName = 'Kayue\\WordpressBundle\\Entity\\' . substr($entityName, strlen('KayueWordpressBundle:'));
         }
 
         return parent::getRepository($entityName);

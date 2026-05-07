@@ -75,7 +75,6 @@ class ManagerRegistry implements ManagerRegistryInterface
 
         if (!isset($this->managers[$this->currentBlogId])) {
             $config = ORMSetup::createAttributeMetadataConfiguration([], 'prod' !== $this->environment);
-            $config->addEntityNamespace('KayueWordpressBundle', 'Kayue\WordpressBundle\Entity');
             $config->setAutoGenerateProxyClasses(true);
             $config->setProxyDir($this->defaultEntityManager->getConfiguration()->getProxyDir());
 
