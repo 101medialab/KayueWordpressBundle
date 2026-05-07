@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
+/**
+ * @deprecated This provider is unused in the modern security system.
+ */
 class WordpressProvider implements AuthenticationProviderInterface
 {
     private $userChecker;

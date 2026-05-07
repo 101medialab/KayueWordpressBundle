@@ -5,96 +5,82 @@ namespace Kayue\WordpressBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Kayue\WordpressBundle\Annotation as Wordpress;
 
-/**
- * @ORM\Table(name="blogs")
- * @ORM\Entity
- * @Wordpress\WordpressTable
- */
+#[ORM\Table(name: "blogs")]
+#[ORM\Entity]
+#[Wordpress\WordpressTable]
 class Blog
 {
     /**
      * @var int $id
-     *
-     * @ORM\Column(name="blog_id", type="bigint", length=20)
-     * @ORM\Id
      */
+    #[ORM\Column(name: "blog_id", type: "bigint", length: 20)]
+    #[ORM\Id]
     protected $id;
 
     /**
      * @var int $siteId
-     *
-     * @ORM\Column(name="site_id", type="bigint", length=20)
      */
+    #[ORM\Column(name: "site_id", type: "bigint", length: 20)]
     protected $siteId;
 
     /**
      * @var string $domain
-     *
-     * @ORM\Column(name="domain", type="string", length=200)
      */
+    #[ORM\Column(name: "domain", type: "string", length: 200)]
     protected $domain;
 
     /**
      * @var string $path
-     *
-     * @ORM\Column(name="path", type="string", length=200)
      */
+    #[ORM\Column(name: "path", type: "string", length: 200)]
     protected $path;
 
     /**
      * @var \DateTime $registeredDate
-     *
-     * @ORM\Column(name="registered", type="datetime")
      */
+    #[ORM\Column(name: "registered", type: "datetime")]
     protected $registeredDate;
 
     /**
      * @var \DateTime $lastUpdatedDate
-     *
-     * @ORM\Column(name="last_updated", type="datetime")
      */
+    #[ORM\Column(name: "last_updated", type: "datetime")]
     protected $lastUpdatedDate;
 
     /**
      * @var integer $public
-     *
-     * @ORM\Column(name="public", type="smallint", length=2)
      */
+    #[ORM\Column(name: "public", type: "smallint", length: 2)]
     protected $public;
 
     /**
      * @var integer $archived
-     *
-     * @ORM\Column(name="archived", type="smallint")
      */
+    #[ORM\Column(name: "archived", type: "smallint")]
     protected $archived;
 
     /**
      * @var integer $mature
-     *
-     * @ORM\Column(name="mature", type="smallint", length=2)
      */
+    #[ORM\Column(name: "mature", type: "smallint", length: 2)]
     protected $mature;
 
     /**
      * @var integer $spam
-     *
-     * @ORM\Column(name="spam", type="smallint", length=2)
      */
+    #[ORM\Column(name: "spam", type: "smallint", length: 2)]
     protected $spam;
 
     /**
      * @var integer $deleted
-     *
-     * @ORM\Column(name="deleted", type="smallint", length=2)
      */
+    #[ORM\Column(name: "deleted", type: "smallint", length: 2)]
     protected $deleted;
 
     /**
      * @var integer $langId
-     *
-     * @ORM\Column(name="lang_id", type="integer", length=11)
      */
+    #[ORM\Column(name: "lang_id", type: "integer", length: 11)]
     protected $langId;
 
     /**

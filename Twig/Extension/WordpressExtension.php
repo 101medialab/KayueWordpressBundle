@@ -9,10 +9,11 @@ use Kayue\WordpressBundle\Entity\User;
 use Kayue\WordpressBundle\Wordpress\Helper\AttachmentHelper;
 use Kayue\WordpressBundle\Wordpress\ManagerRegistry;
 use Kayue\WordpressBundle\Wordpress\Shortcode\ShortcodeChain;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class WordpressExtension extends \Twig_Extension
+class WordpressExtension extends AbstractExtension
 {
     /**
      * @var ManagerRegistry
@@ -45,12 +46,6 @@ class WordpressExtension extends \Twig_Extension
         $this->attachmentHelper = $attachmentHelper;
     }
 
-    public function getName()
-    {
-        return "wordpress";
-    }
-
-
     /**
      * @return WordpressEntityManager
      */
@@ -59,42 +54,39 @@ class WordpressExtension extends \Twig_Extension
         return $this->managerRegistry->getManager();
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
-        return array(
-            new Twig_SimpleFilter('wp_autop', [$this, 'wpautop']),
-            new Twig_SimpleFilter('wp_texturize', [$this, 'wptexturize']),
-            new Twig_SimpleFilter('wp_shortcode', [$this, 'doShortcode']),
-        );
+        return [
+            new TwigFilter('wp_autop', [$this, 'wpautop']),
+            new TwigFilter('wp_texturize', [$this, 'wptexturize']),
+            new TwigFilter('wp_shortcode', [$this, 'doShortcode']),
+        ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
-        return array(
-            new Twig_SimpleFunction('wp_switch_blog', [$this, 'switchBlog']),
-            new Twig_SimpleFunction('wp_find_option_by', [$this, 'findOneOptionBy']),
+        return [
+            new TwigFunction('wp_switch_blog', [$this, 'switchBlog']),
+            new TwigFunction('wp_find_option_by', [$this, 'findOneOptionBy']),
 
-            // Post related functions
-            new Twig_SimpleFunction('wp_find_post_by', [$this, 'findOnePostBy']),
-            new Twig_SimpleFunction('wp_find_post_metas_by', [$this, 'findPostMetasBy']),
-            new Twig_SimpleFunction('wp_find_comments_by_post', [$this, 'findCommentsByPost']),
-            new Twig_SimpleFunction('wp_find_attachments', [$this, 'findAttachmentsByPost']),
-            new Twig_SimpleFunction('wp_find_attachment_by_id', [$this, 'findOneAttachmentById']),
-            new Twig_SimpleFunction('wp_find_thumbnail', [$this, 'findThumbnail']),
-            new Twig_SimpleFunction('wp_find_featured_image', [$this, 'findThumbnail']),
-            new Twig_SimpleFunction('wp_get_attachment_url', [$this, 'getAttachmentUrl']),
-            new Twig_SimpleFunction('wp_get_attachment_alt_text', [$this, 'getAttachmentAltText']),
-            new Twig_SimpleFunction('wp_get_post_format', [$this, 'getPostFormatByPost']),
+            new TwigFunction('wp_find_post_by', [$this, 'findOnePostBy']),
+            new TwigFunction('wp_find_post_metas_by', [$this, 'findPostMetasBy']),
+            new TwigFunction('wp_find_comments_by_post', [$this, 'findCommentsByPost']),
+            new TwigFunction('wp_find_attachments', [$this, 'findAttachmentsByPost']),
+            new TwigFunction('wp_find_attachment_by_id', [$this, 'findOneAttachmentById']),
+            new TwigFunction('wp_find_thumbnail', [$this, 'findThumbnail']),
+            new TwigFunction('wp_find_featured_image', [$this, 'findThumbnail']),
+            new TwigFunction('wp_get_attachment_url', [$this, 'getAttachmentUrl']),
+            new TwigFunction('wp_get_attachment_alt_text', [$this, 'getAttachmentAltText']),
+            new TwigFunction('wp_get_post_format', [$this, 'getPostFormatByPost']),
 
-            // Terms related functions
-            new Twig_SimpleFunction('wp_find_terms_by_post', [$this, 'findTermsByPost']),
-            new Twig_SimpleFunction('wp_find_categories_by_post', [$this, 'findCategoriesByPost']),
-            new Twig_SimpleFunction('wp_find_tags_by_post', [$this, 'findTagsByPost']),
+            new TwigFunction('wp_find_terms_by_post', [$this, 'findTermsByPost']),
+            new TwigFunction('wp_find_categories_by_post', [$this, 'findCategoriesByPost']),
+            new TwigFunction('wp_find_tags_by_post', [$this, 'findTagsByPost']),
 
-            // User related functions
-            new Twig_SimpleFunction('wp_find_user_meta_by', [$this, 'findOneUserMetaBy']),
-            new Twig_SimpleFunction('wp_find_user_metas_by', [$this, 'findUserMetasBy']),
-        );
+            new TwigFunction('wp_find_user_meta_by', [$this, 'findOneUserMetaBy']),
+            new TwigFunction('wp_find_user_metas_by', [$this, 'findUserMetasBy']),
+        ];
     }
 
     public function switchBlog($id)

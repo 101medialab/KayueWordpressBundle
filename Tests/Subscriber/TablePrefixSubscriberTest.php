@@ -2,57 +2,60 @@
 
 namespace Kayue\WordpressBundle\Tests\Subscriber;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
 use Kayue\WordpressBundle\Subscriber\TablePrefixSubscriber;
+use PHPUnit\Framework\TestCase;
 
-class TablePrefixSubscriberTest extends \PHPUnit_Framework_TestCase
+class TablePrefixSubscriberTest extends TestCase
 {
-    protected function setUp()
+    private function createInitializedMetadata(string $className): ClassMetadata
     {
-        AnnotationRegistry::registerFile(__DIR__ . '/../../Annotation/WordpressTable.php');
+        $metadata = new ClassMetadata($className);
+        $metadata->initializeReflection(new RuntimeReflectionService());
+
+        return $metadata;
     }
 
     public function testLoadClassMetadataWithWordpressBundleEntity()
     {
         $subscriber = new TablePrefixSubscriber('wp_');
         $em = $this->getEntityManagerMock();
-        $metadataInfo = $this->getClassMetadataInfoMock();
-        $metadataInfo->expects($this->once())->method('setPrimaryTable');
+        $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\Sample');
         $args = new LoadClassMetadataEventArgs($metadataInfo, $em);
 
         $subscriber->loadClassMetadata($args);
+
+        $this->assertStringStartsWith('wp_', $metadataInfo->getTableName());
     }
 
     public function testLoadClassMetadataWithOtherEntity()
     {
         $subscriber = new TablePrefixSubscriber('wp_');
         $em = $this->getEntityManagerMock();
-        $metadataInfo = $this->getClassMetadataInfoMock(false);
-        $metadataInfo->expects($this->never())->method('setPrimaryTable');
+        $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\SampleWithoutAnnotation');
+        $originalTable = $metadataInfo->getTableName();
         $args = new LoadClassMetadataEventArgs($metadataInfo, $em);
 
         $subscriber->loadClassMetadata($args);
+
+        $this->assertEquals($originalTable, $metadataInfo->getTableName());
     }
 
     public function testPrefixWithNormalEntityManager()
     {
         $subscriber = new TablePrefixSubscriber('other_');
-
         $em = $this->getEntityManagerMock();
 
-        $metadataInfo = $this->getClassMetadataInfoMock();
+        $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\Sample');
         $metadataInfo->name = 'Kayue\WordpressBundle\Entity\Post';
-        $metadataInfo->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue('posts'));
-        $metadataInfo->expects($this->once())
-            ->method('setPrimaryTable')
-            ->with(array('name'=>'other_posts'));
+        $metadataInfo->setPrimaryTable(['name' => 'posts']);
 
         $args = new LoadClassMetadataEventArgs($metadataInfo, $em);
-
         $subscriber->loadClassMetadata($args);
+
+        $this->assertEquals('other_posts', $metadataInfo->getTableName());
     }
 
     /**
@@ -67,56 +70,28 @@ class TablePrefixSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getBlogId')
             ->will($this->returnValue($blogId));
 
-        $metadataInfo = $this->getClassMetadataInfoMock();
+        $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\Sample');
         $metadataInfo->name = "Kayue\\WordpressBundle\\Entity\\{$entityName}";
-        $metadataInfo->expects($this->any())
-            ->method('getTableName')
-            ->will($this->returnValue($tableName));
-        $metadataInfo->expects($this->once())
-            ->method('setPrimaryTable')
-            ->with(array('name'=>"wp_{$result}"));
+        $metadataInfo->setPrimaryTable(['name' => $tableName]);
 
         $args = new LoadClassMetadataEventArgs($metadataInfo, $em);
-
         $subscriber->loadClassMetadata($args);
+
+        $this->assertEquals("wp_{$result}", $metadataInfo->getTableName());
     }
 
-    public function wordpressEntitiesProvider()
+    public static function wordpressEntitiesProvider()
     {
-        return array(
-            array(1, 'User', 'users', 'users'),
-            array(1, 'UserMeta', 'usermeta', 'usermeta'),
-            array(1, 'Post', 'posts', 'posts'),
-            array(1, 'Term', 'terms', 'terms'),
-            array(2, 'User', 'users', 'users'),
-            array(2, 'UserMeta', 'usermeta', 'usermeta'),
-            array(2, 'Post', 'posts', '2_posts'),
-            array(2, 'Term', 'terms', '2_terms'),
-        );
-    }
-
-    private function getClassMetadataInfoMock($wordPressAnnotated = true)
-    {
-        $mock = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
-        if ($wordPressAnnotated) {
-            $mock
-                ->expects($this->any())
-                ->method('getReflectionClass')
-                ->will($this->returnValue(new \ReflectionClass('Kayue\WordpressBundle\Tests\Fixture\Sample')))
-            ;
-        } else {
-            $mock
-                ->expects($this->any())
-                ->method('getReflectionClass')
-                ->will($this->returnValue(new \ReflectionClass('Kayue\WordpressBundle\Tests\Fixture\SampleWithoutAnnotation')))
-            ;
-        }
-
-        return $mock;
+        return [
+            [1, 'User', 'users', 'users'],
+            [1, 'UserMeta', 'usermeta', 'usermeta'],
+            [1, 'Post', 'posts', 'posts'],
+            [1, 'Term', 'terms', 'terms'],
+            [2, 'User', 'users', 'users'],
+            [2, 'UserMeta', 'usermeta', 'usermeta'],
+            [2, 'Post', 'posts', '2_posts'],
+            [2, 'Term', 'terms', '2_terms'],
+        ];
     }
 
     private function getEntityManagerMock()

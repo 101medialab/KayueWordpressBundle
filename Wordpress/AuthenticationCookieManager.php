@@ -53,7 +53,7 @@ class AuthenticationCookieManager
         }
 
         try {
-            $user = $userProvider->loadUserByUsername($username);
+            $user = $userProvider->loadUserByIdentifier($username);
         } catch (Exception $exception) {
             if (!$exception instanceof AuthenticationException) {
                 $exception = new AuthenticationException($exception->getMessage(), $exception->getCode(), $exception);
@@ -85,7 +85,7 @@ class AuthenticationCookieManager
      */
     public function createLoggedInCookie(UserInterface $user, $lifetime = 31536000)
     {
-        $username   = $user->getUsername();
+        $username   = $user->getUserIdentifier();
         $password   = $user->getPassword();
         $expiration = time() + $lifetime;
         $hmac       = $this->generateHmac($username, $expiration, $password);

@@ -6,65 +6,56 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\Persistence\Proxy;
 use Kayue\WordpressBundle\Annotation as Wordpress;
 use Kayue\WordpressBundle\Doctrine\WordpressEntityManager;
 use Symfony\Component\Validator\Constraints as Constraints;
 
-/**
- * @ORM\Table(name="posts")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="Kayue\WordpressBundle\Repository\PostRepository")
- * @Wordpress\WordpressTable
- */
+#[ORM\Table(name: "posts")]
+#[ORM\Entity(repositoryClass: \Kayue\WordpressBundle\Repository\PostRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[Wordpress\WordpressTable]
 class Post
 {
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="ID", type="wordpressid")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
+    #[ORM\Column(name: "ID", type: "wordpressid")]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     protected $id;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_date", type="datetime", nullable=false)
      */
+    #[ORM\Column(name: "post_date", type: "datetime", nullable: false)]
     protected $date;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_date_gmt", type="datetime", nullable=false)
      */
+    #[ORM\Column(name: "post_date_gmt", type: "datetime", nullable: false)]
     protected $dateGmt;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_content", type="text", nullable=false)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "post_content", type: "text", nullable: false)]
+    #[Constraints\NotBlank]
     protected $content;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_title", type="text", nullable=false)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "post_title", type: "text", nullable: false)]
+    #[Constraints\NotBlank]
     protected $title;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_excerpt", type="text", nullable=false)
-     * @Constraints\NotBlank()
      */
+    #[ORM\Column(name: "post_excerpt", type: "text", nullable: false)]
+    #[Constraints\NotBlank]
     protected $excerpt;
 
     /**
@@ -74,161 +65,133 @@ class Post
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_status", type="string", length=20, nullable=false)
      */
+    #[ORM\Column(name: "post_status", type: "string", length: 20, nullable: false)]
     protected $status = "publish";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="comment_status", type="string", length=20, nullable=false)
      */
+    #[ORM\Column(name: "comment_status", type: "string", length: 20, nullable: false)]
     protected $commentStatus = "open";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="ping_status", type="string", length=20, nullable=false)
      */
+    #[ORM\Column(name: "ping_status", type: "string", length: 20, nullable: false)]
     protected $pingStatus = "open";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_password", type="string", length=20, nullable=false)
      */
+    #[ORM\Column(name: "post_password", type: "string", length: 20, nullable: false)]
     protected $password = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_name", type="string", length=200, nullable=false)
      */
+    #[ORM\Column(name: "post_name", type: "string", length: 200, nullable: false)]
     protected $slug;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="to_ping", type="text", nullable=false)
      */
+    #[ORM\Column(name: "to_ping", type: "text", nullable: false)]
     protected $toPing = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="pinged", type="text", nullable=false)
      */
+    #[ORM\Column(name: "pinged", type: "text", nullable: false)]
     protected $pinged = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_modified", type="datetime", nullable=false)
      */
+    #[ORM\Column(name: "post_modified", type: "datetime", nullable: false)]
     protected $modifiedDate;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_modified_gmt", type="datetime", nullable=false)
      */
+    #[ORM\Column(name: "post_modified_gmt", type: "datetime", nullable: false)]
     protected $modifiedDateGmt;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_content_filtered", type="text", nullable=false)
      */
+    #[ORM\Column(name: "post_content_filtered", type: "text", nullable: false)]
     protected $contentFiltered = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\ManyToOne(targetEntity="Post", inversedBy="children")
-     * @ORM\JoinColumn(name="post_parent", referencedColumnName="ID")
      */
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: "children")]
+    #[ORM\JoinColumn(name: "post_parent", referencedColumnName: "ID")]
     protected $parent;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Post", mappedBy="parent")
      */
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: "parent")]
     protected $children;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="guid", type="string", length=255, nullable=false)
      */
+    #[ORM\Column(name: "guid", type: "string", length: 255, nullable: false)]
     protected $guid = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="menu_order", type="integer", length=11, nullable=false)
      */
+    #[ORM\Column(name: "menu_order", type: "integer", length: 11, nullable: false)]
     protected $menuOrder = 0;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_type", type="string", nullable=false)
      */
+    #[ORM\Column(name: "post_type", type: "string", nullable: false)]
     protected $type = "post";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="post_mime_type", type="string", length=100, nullable=false)
      */
+    #[ORM\Column(name: "post_mime_type", type: "string", length: 100, nullable: false)]
     protected $mimeType = "";
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\Column(name="comment_count", type="bigint", length=20, nullable=false)
      */
+    #[ORM\Column(name: "comment_count", type: "bigint", length: 20, nullable: false)]
     protected $commentCount = 0;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\PostMeta", mappedBy="post", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: PostMeta::class, mappedBy: "post", cascade: ["persist"])]
     protected $metas;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\OneToMany(targetEntity="Kayue\WordpressBundle\Entity\Comment", mappedBy="post", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: "post", cascade: ["persist"])]
     protected $comments;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\ManyToOne(targetEntity="Kayue\WordpressBundle\Entity\User", inversedBy="posts")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="post_author", referencedColumnName="ID")
-     * })
      */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "posts")]
+    #[ORM\JoinColumn(name: "post_author", referencedColumnName: "ID")]
     protected $user;
 
     /**
      * {@inheritdoc}
-     *
-     * @ORM\ManyToMany(targetEntity="Kayue\WordpressBundle\Entity\Taxonomy", inversedBy="posts")
-     * @ORM\JoinTable(name="term_relationships",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="object_id", referencedColumnName="ID")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="term_taxonomy_id", referencedColumnName="term_taxonomy_id")
-     *   }
-     * )
      */
+    #[ORM\ManyToMany(targetEntity: Taxonomy::class, inversedBy: "posts")]
+    #[ORM\JoinTable(name: "term_relationships")]
+    #[ORM\JoinColumn(name: "object_id", referencedColumnName: "ID")]
+    #[ORM\InverseJoinColumn(name: "term_taxonomy_id", referencedColumnName: "term_taxonomy_id")]
     protected $taxonomies;
 
     protected $blogId;
@@ -377,7 +340,7 @@ class Post
         if (!empty($this->excerpt)) {
             return $this->excerpt;
         }
-        
+
         return $this->trimContent($this->getContent());
     }
 
@@ -823,19 +786,17 @@ class Post
         return $this->blogId;
     }
 
-    /**
-     * @ORM\PostLoad
-     */
+    #[ORM\PostLoad]
     public function onPostLoad(LifecycleEventArgs $eventArgs)
     {
-        if ($eventArgs->getEntityManager() instanceof WordpressEntityManager) {
-            $this->blogId = $eventArgs->getEntityManager()->getBlogId();
+        $wpEm = WordpressEntityManager::findWrapper($eventArgs->getEntityManager());
+
+        if ($wpEm !== null) {
+            $this->blogId = $wpEm->getBlogId();
         }
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->date            = new \DateTime('now');
@@ -844,9 +805,7 @@ class Post
         $this->modifiedDateGmt = new \DateTime('now', new \DateTimeZone('GMT'));
     }
 
-    /**
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->modifiedDate     = new \DateTime('now');
