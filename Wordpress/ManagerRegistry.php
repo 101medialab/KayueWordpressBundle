@@ -3,7 +3,7 @@
 namespace Kayue\WordpressBundle\Wordpress;
 
 use BadMethodCallException;
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\ManagerRegistry as ManagerRegistryInterface;
