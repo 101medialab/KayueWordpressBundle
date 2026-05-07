@@ -11,11 +11,31 @@ use Doctrine\ORM\EntityRepository;
 
 class WordpressEntityManager extends EntityManagerDecorator
 {
+    private static \WeakMap $wrapperMap;
+
     protected int $blogId = 1;
 
     public function __construct(EntityManagerInterface $wrapped)
     {
         parent::__construct($wrapped);
+
+        if (!isset(self::$wrapperMap)) {
+            self::$wrapperMap = new \WeakMap();
+        }
+        self::$wrapperMap[$wrapped] = $this;
+    }
+
+    public static function findWrapper(EntityManagerInterface $em): ?self
+    {
+        if ($em instanceof self) {
+            return $em;
+        }
+
+        if (isset(self::$wrapperMap) && isset(self::$wrapperMap[$em])) {
+            return self::$wrapperMap[$em];
+        }
+
+        return null;
     }
 
     public function setBlogId(int $blogId): void
