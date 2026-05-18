@@ -15,7 +15,7 @@
         "symfony/password-hasher": "^5.4",
         "symfony/cache": "^5.4",
         "doctrine/orm": "^2.14",
-        "doctrine/dbal": "^3.0",
+        "doctrine/dbal": "^2.13 || ^3.0",
         "twig/twig": "^3.0"
     },
     "require-dev": {
