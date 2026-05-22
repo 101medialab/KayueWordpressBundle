@@ -55,38 +55,53 @@ class WordpressEntityManagerTest extends TestCase
         $em->flush();
     }
 
-    public function testFindWrapperReturnsDecoratorFromInnerEm(): void
-    {
-        $inner = $this->createMock(EntityManagerInterface::class);
-        $wpEm = new WordpressEntityManager($inner);
-
-        $result = WordpressEntityManager::findWrapper($inner);
-
-        $this->assertSame($wpEm, $result);
-    }
-
-    public function testFindWrapperReturnsSelfWhenPassedDecorator(): void
-    {
-        $inner = $this->createMock(EntityManagerInterface::class);
-        $wpEm = new WordpressEntityManager($inner);
-
-        $result = WordpressEntityManager::findWrapper($wpEm);
-
-        $this->assertSame($wpEm, $result);
-    }
-
-    public function testFindWrapperReturnsNullForUnknownEm(): void
+    public function testFindBlogIdReturnsOneWhenNotRegistered(): void
     {
         $unknown = $this->createMock(EntityManagerInterface::class);
 
-        $result = WordpressEntityManager::findWrapper($unknown);
+        $this->assertSame(1, WordpressEntityManager::findBlogId($unknown));
+    }
 
-        $this->assertNull($result);
+    public function testFindBlogIdReturnsSetValueViaDecorator(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        $wpEm = new WordpressEntityManager($inner);
+        $wpEm->setBlogId(5);
+
+        $this->assertSame(5, WordpressEntityManager::findBlogId($wpEm));
+    }
+
+    public function testFindBlogIdReturnsSetValueViaInnerEm(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        $wpEm = new WordpressEntityManager($inner);
+        $wpEm->setBlogId(7);
+
+        $this->assertSame(7, WordpressEntityManager::findBlogId($inner));
+    }
+
+    public function testSetBlogIdLastWriteWinsForSharedInner(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        $first = new WordpressEntityManager($inner);
+        $first->setBlogId(2);
+        $second = new WordpressEntityManager($inner);
+        $second->setBlogId(9);
+
+        $this->assertSame(9, WordpressEntityManager::findBlogId($inner));
+    }
+
+    public function testConstructorDoesNotRegisterWithoutSetBlogId(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        new WordpressEntityManager($inner);
+
+        $this->assertSame(1, WordpressEntityManager::findBlogId($inner));
     }
 
     protected function tearDown(): void
     {
-        $ref = new \ReflectionProperty(WordpressEntityManager::class, 'wrapperMap');
-        $ref->setValue(null, new \WeakMap());
+        $ref = new \ReflectionProperty(WordpressEntityManager::class, 'blogIdMap');
+        $ref->setValue(null, null);
     }
 }

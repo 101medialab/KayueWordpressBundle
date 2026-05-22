@@ -60,6 +60,23 @@ class TablePrefixSubscriberTest extends TestCase
         $this->assertEquals('other_posts', $metadataInfo->getTableName());
     }
 
+    public function testNoBlogIdSetUsesBasePrefix(): void
+    {
+        $subscriber = new TablePrefixSubscriber('wp_');
+
+        $innerEm = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        new WordpressEntityManager($innerEm); // construct only, no setBlogId
+
+        $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\Sample');
+        $metadataInfo->name = 'Kayue\WordpressBundle\Entity\Post';
+        $metadataInfo->setPrimaryTable(['name' => 'posts']);
+
+        $args = new LoadClassMetadataEventArgs($metadataInfo, $innerEm);
+        $subscriber->loadClassMetadata($args);
+
+        $this->assertEquals('wp_posts', $metadataInfo->getTableName());
+    }
+
     /**
      * @dataProvider wordpressEntitiesProvider
      */
@@ -97,6 +114,12 @@ class TablePrefixSubscriberTest extends TestCase
             [3, 'User', 'users', 'users'],
             [3, 'UserMeta', 'usermeta', 'usermeta'],
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        $ref = new \ReflectionProperty(WordpressEntityManager::class, 'blogIdMap');
+        $ref->setValue(null, null);
     }
 
     private function getEntityManagerMock()
