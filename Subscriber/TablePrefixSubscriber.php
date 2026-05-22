@@ -3,7 +3,9 @@
 namespace Kayue\WordpressBundle\Subscriber;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\EntityManagerInterface;
 use Kayue\WordpressBundle\Annotation\WordpressTable;
+use Kayue\WordpressBundle\Doctrine\WordpressEntityManager;
 
 class TablePrefixSubscriber
 {
@@ -41,7 +43,7 @@ class TablePrefixSubscriber
         }
     }
 
-    private function getPrefix(string $entityName, $em): string
+    private function getPrefix(string $entityName, EntityManagerInterface $em): string
     {
         $prefix = $this->prefix;
 
@@ -50,12 +52,10 @@ class TablePrefixSubscriber
             return $this->prefix;
         }
 
-        if (method_exists($em, 'getBlogId')) {
-            $blogId = $em->getBlogId();
+        $wpEm = WordpressEntityManager::findWrapper($em);
 
-            if ($blogId > 1) {
-                $prefix = $prefix . $blogId . '_';
-            }
+        if ($wpEm !== null && $wpEm->getBlogId() > 1) {
+            $prefix = $prefix . $wpEm->getBlogId() . '_';
         }
 
         return $prefix;

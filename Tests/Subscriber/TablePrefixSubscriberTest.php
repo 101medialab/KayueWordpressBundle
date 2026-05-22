@@ -2,9 +2,11 @@
 
 namespace Kayue\WordpressBundle\Tests\Subscriber;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\RuntimeReflectionService;
+use Kayue\WordpressBundle\Doctrine\WordpressEntityManager;
 use Kayue\WordpressBundle\Subscriber\TablePrefixSubscriber;
 use PHPUnit\Framework\TestCase;
 
@@ -65,16 +67,15 @@ class TablePrefixSubscriberTest extends TestCase
     {
         $subscriber = new TablePrefixSubscriber('wp_');
 
-        $em = $this->getWordpressEntityManagerMock();
-        $em->expects($this->any())
-            ->method('getBlogId')
-            ->will($this->returnValue($blogId));
+        $innerEm = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        $wpEm = new WordpressEntityManager($innerEm);
+        $wpEm->setBlogId($blogId);
 
         $metadataInfo = $this->createInitializedMetadata('Kayue\WordpressBundle\Tests\Fixture\Sample');
         $metadataInfo->name = "Kayue\\WordpressBundle\\Entity\\{$entityName}";
         $metadataInfo->setPrimaryTable(['name' => $tableName]);
 
-        $args = new LoadClassMetadataEventArgs($metadataInfo, $em);
+        $args = new LoadClassMetadataEventArgs($metadataInfo, $innerEm);
         $subscriber->loadClassMetadata($args);
 
         $this->assertEquals("wp_{$result}", $metadataInfo->getTableName());
@@ -91,6 +92,10 @@ class TablePrefixSubscriberTest extends TestCase
             [2, 'UserMeta', 'usermeta', 'usermeta'],
             [2, 'Post', 'posts', '2_posts'],
             [2, 'Term', 'terms', '2_terms'],
+            [3, 'Post', 'posts', '3_posts'],
+            [3, 'Term', 'terms', '3_terms'],
+            [3, 'User', 'users', 'users'],
+            [3, 'UserMeta', 'usermeta', 'usermeta'],
         ];
     }
 
@@ -101,10 +106,4 @@ class TablePrefixSubscriberTest extends TestCase
             ->getMock();
     }
 
-    private function getWordpressEntityManagerMock()
-    {
-        return $this->getMockBuilder('Kayue\WordpressBundle\Doctrine\WordpressEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
 }
