@@ -34,12 +34,12 @@ class ManagerRegistry implements ManagerRegistryInterface
     protected $rootDir;
     protected $environment;
     protected $currentBlogId = 1;
-    protected $previousBlogId = 1;
+    protected ?int $previousBlogId = null;
     protected $managers = [];
 
-    private $metadataCache;
-    private $queryCache;
-    private $resultCache;
+    protected CacheItemPoolInterface $metadataCache;
+    protected CacheItemPoolInterface $queryCache;
+    protected CacheItemPoolInterface $resultCache;
 
     public function __construct(
         Connection $connection,
@@ -114,7 +114,9 @@ class ManagerRegistry implements ManagerRegistryInterface
      */
     public function restorePreviousBlog()
     {
-        $this->setCurrentBlogId($this->previousBlogId);
+        if (null !== $this->previousBlogId) {
+            $this->setCurrentBlogId($this->previousBlogId);
+        }
     }
 
     protected function getCachePool(CacheItemPoolInterface $pool, int $blogId): CacheItemPoolInterface
