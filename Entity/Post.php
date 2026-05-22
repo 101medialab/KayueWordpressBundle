@@ -789,11 +789,7 @@ class Post
     #[ORM\PostLoad]
     public function onPostLoad(LifecycleEventArgs $eventArgs)
     {
-        $wpEm = WordpressEntityManager::findWrapper($eventArgs->getEntityManager());
-
-        if ($wpEm !== null) {
-            $this->blogId = $wpEm->getBlogId();
-        }
+        $this->blogId = WordpressEntityManager::findBlogId($eventArgs->getEntityManager());
     }
 
     #[ORM\PrePersist]

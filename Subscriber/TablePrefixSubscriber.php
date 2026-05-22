@@ -45,19 +45,13 @@ class TablePrefixSubscriber
 
     private function getPrefix(string $entityName, EntityManagerInterface $em): string
     {
-        $prefix = $this->prefix;
-
         if ($entityName === 'Kayue\WordpressBundle\Entity\User' ||
             $entityName === 'Kayue\WordpressBundle\Entity\UserMeta') {
             return $this->prefix;
         }
 
-        $wpEm = WordpressEntityManager::findWrapper($em);
+        $blogId = WordpressEntityManager::findBlogId($em);
 
-        if ($wpEm !== null && $wpEm->getBlogId() > 1) {
-            $prefix = $prefix . $wpEm->getBlogId() . '_';
-        }
-
-        return $prefix;
+        return $blogId > 1 ? $this->prefix . $blogId . '_' : $this->prefix;
     }
 }

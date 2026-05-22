@@ -11,36 +11,16 @@ use Doctrine\ORM\EntityRepository;
 
 class WordpressEntityManager extends EntityManagerDecorator
 {
-    private static \WeakMap $wrapperMap;
+    private static ?\WeakMap $blogIdMap = null;
 
     protected int $blogId = 1;
-
-    public function __construct(EntityManagerInterface $wrapped)
-    {
-        parent::__construct($wrapped);
-
-        if (!isset(self::$wrapperMap)) {
-            self::$wrapperMap = new \WeakMap();
-        }
-        self::$wrapperMap[$wrapped] = $this;
-    }
-
-    public static function findWrapper(EntityManagerInterface $em): ?self
-    {
-        if ($em instanceof self) {
-            return $em;
-        }
-
-        if (isset(self::$wrapperMap) && isset(self::$wrapperMap[$em])) {
-            return self::$wrapperMap[$em];
-        }
-
-        return null;
-    }
 
     public function setBlogId(int $blogId): void
     {
         $this->blogId = $blogId;
+
+        self::$blogIdMap ??= new \WeakMap();
+        self::$blogIdMap[$this->wrapped] = $blogId;
     }
 
     public function getBlogId(): int
@@ -48,9 +28,23 @@ class WordpressEntityManager extends EntityManagerDecorator
         return $this->blogId;
     }
 
+    public static function findBlogId(EntityManagerInterface $em): int
+    {
+        if ($em instanceof self) {
+            return $em->getBlogId();
+        }
+
+        if (self::$blogIdMap !== null && isset(self::$blogIdMap[$em])) {
+            return self::$blogIdMap[$em];
+        }
+
+        return 1;
+    }
+
     public static function create(Connection $conn, Configuration $config): self
     {
         $em = EntityManager::create($conn, $config, $conn->getEventManager());
+
         return new self($em);
     }
 
