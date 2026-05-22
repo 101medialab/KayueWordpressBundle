@@ -92,6 +92,10 @@ class TablePrefixSubscriberTest extends TestCase
             [2, 'UserMeta', 'usermeta', 'usermeta'],
             [2, 'Post', 'posts', '2_posts'],
             [2, 'Term', 'terms', '2_terms'],
+            [3, 'Post', 'posts', '3_posts'],
+            [3, 'Term', 'terms', '3_terms'],
+            [3, 'User', 'users', 'users'],
+            [3, 'UserMeta', 'usermeta', 'usermeta'],
         ];
     }
 

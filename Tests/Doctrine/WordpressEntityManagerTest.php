@@ -54,4 +54,39 @@ class WordpressEntityManagerTest extends TestCase
         $em = new WordpressEntityManager($wrapped);
         $em->flush();
     }
+
+    public function testFindWrapperReturnsDecoratorFromInnerEm(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        $wpEm = new WordpressEntityManager($inner);
+
+        $result = WordpressEntityManager::findWrapper($inner);
+
+        $this->assertSame($wpEm, $result);
+    }
+
+    public function testFindWrapperReturnsSelfWhenPassedDecorator(): void
+    {
+        $inner = $this->createMock(EntityManagerInterface::class);
+        $wpEm = new WordpressEntityManager($inner);
+
+        $result = WordpressEntityManager::findWrapper($wpEm);
+
+        $this->assertSame($wpEm, $result);
+    }
+
+    public function testFindWrapperReturnsNullForUnknownEm(): void
+    {
+        $unknown = $this->createMock(EntityManagerInterface::class);
+
+        $result = WordpressEntityManager::findWrapper($unknown);
+
+        $this->assertNull($result);
+    }
+
+    protected function tearDown(): void
+    {
+        $ref = new \ReflectionProperty(WordpressEntityManager::class, 'wrapperMap');
+        $ref->setValue(null, new \WeakMap());
+    }
 }
